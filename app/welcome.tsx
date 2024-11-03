@@ -22,7 +22,7 @@ const Welcome = () => {
           </Text>
         </View>
         <View className="w-full gap-7">
-          <Button onPress={() => router.push('/sign-in')}>
+          <Button onPress={() => router.push('/sign-up')}>
             <Text>Mulai Sekarang</Text>
           </Button>
         </View>
