@@ -63,7 +63,7 @@ export default function AddNews() {
   ] as const;
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper routeName="Tambah Berita">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}>
