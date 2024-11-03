@@ -14,11 +14,13 @@
     "@expo/react-native-action-sheet": "^4.1.0",
     "@expo/vector-icons": "^14.0.0",
     "@gorhom/bottom-sheet": "^4.6.4",
+    "@hookform/resolvers": "^3.9.1",
     "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-community/slider": "4.5.2",
     "@react-native-picker/picker": "2.7.5",
     "@react-navigation/native": "^6.1.7",
     "@rn-primitives/avatar": "^1.1.0",
+    "@rn-primitives/slot": "^1.1.0",
     "@roninoss/icons": "^0.0.4",
     "@shopify/flash-list": "1.6.4",
     "class-variance-authority": "^0.7.0",
@@ -37,6 +39,7 @@
     "nativewind": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.53.1",
     "react-native": "0.74.5",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-pager-view": "6.3.0",
@@ -45,7 +48,8 @@
     "react-native-screens": "3.31.1",
     "react-native-uitextview": "^1.1.4",
     "react-native-web": "~0.19.10",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
