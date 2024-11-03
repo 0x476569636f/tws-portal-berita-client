@@ -12,7 +12,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '~/components/nativewindui/Button';
 import Loading from '~/components/Loading';
 import ScreenWrapper from '~/components/ScreenWrapperWithNavbar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '~/context/auth';
 
 const schema = yup.object().shape({
@@ -48,10 +47,7 @@ const SignIn = () => {
     try {
       await login(email, password);
     } catch (error: any) {
-      Alert.alert(
-        'Login Gagal',
-        error?.response?.data?.message || 'An error occurred during login'
-      );
+      Alert.alert('Login Gagal', error?.response?.data?.message || 'Ada masalah saat login');
     } finally {
       setLoading(false);
     }
