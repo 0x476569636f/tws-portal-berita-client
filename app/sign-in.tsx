@@ -14,8 +14,8 @@ import Loading from '~/components/Loading';
 import ScreenWrapper from '~/components/ScreenWrapperWithNavbar';
 
 const schema = yup.object().shape({
-  email: yup.string().required('* Email harus di isi').email('Invalid email'),
-  password: yup.string().required('* Password harus di isi').min(8, 'Password minimal 8 karakter'),
+  email: yup.string().required('* Email harus di isi').email('Email tidak valid'),
+  password: yup.string().required('* Password harus di isi'),
 });
 
 const SignIn = () => {
@@ -55,8 +55,8 @@ const SignIn = () => {
 
             <View className="gap-y-1">
               <Text className="text-3xl font-bold">Selamat Datang Kembali!</Text>
-              <Text className="text-lg font-normal tracking-wide">
-                Masuk untuk Melanjutkan dan Bagikan Tawa Bersama Kami!
+              <Text className="mt-2 text-lg font-normal tracking-wide">
+                Masuk untuk Mengakses Berita Terkini dan Informasi Terbaru
               </Text>
             </View>
             <View className="gap-8 rounded-xl border border-border bg-card p-4 pb-6">
