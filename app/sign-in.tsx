@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import React from 'react';
 import { BackButton } from '~/components/BackButton';
 import { useRouter } from 'expo-router';
@@ -12,6 +12,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '~/components/nativewindui/Button';
 import Loading from '~/components/Loading';
 import ScreenWrapper from '~/components/ScreenWrapperWithNavbar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '~/context/auth';
 
 const schema = yup.object().shape({
   email: yup.string().required('* Email harus di isi').email('Email tidak valid'),
@@ -19,6 +21,7 @@ const schema = yup.object().shape({
 });
 
 const SignIn = () => {
+  const { login } = useAuth();
   const { isDarkColorScheme } = useColorScheme();
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
@@ -42,6 +45,16 @@ const SignIn = () => {
     const password = formData.password.trim();
 
     setLoading(true);
+    try {
+      await login(email, password);
+    } catch (error: any) {
+      Alert.alert(
+        'Login Gagal',
+        error?.response?.data?.message || 'An error occurred during login'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

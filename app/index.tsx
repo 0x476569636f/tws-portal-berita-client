@@ -10,7 +10,7 @@ const index = () => {
   return (
     <ScreenWrapper>
       <Text>Halo</Text>
-      <Button onPress={() => router.push('/sign-in')}>
+      <Button onPress={() => router.push('/welcome')}>
         <Text>Login</Text>
       </Button>
     </ScreenWrapper>
