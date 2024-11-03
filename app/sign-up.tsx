@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import React from 'react';
 import ScreenWrapper from '~/components/ScreenWrapperWithNavbar';
 import { BackButton } from '~/components/BackButton';
@@ -12,6 +12,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '~/components/nativewindui/Button';
 import Loading from '~/components/Loading';
+import axios from 'axios';
 
 const schema = yup.object().shape({
   name: yup
@@ -21,14 +22,13 @@ const schema = yup.object().shape({
     .max(20, 'Nama maksimal 20 karakter'),
   email: yup.string().required('* Email harus di isi').email('Invalid email'),
   password: yup.string().required('* Password harus di isi').min(8, 'Password minimal 8 karakter'),
-  confirmPassword: yup.string().oneOf([yup.ref('password')], '* Konfrimasi password tidak sama'),
+  confirmPassword: yup.string().oneOf([yup.ref('password')], '* Konfirmasi password tidak sama'),
 });
 
 const SignUp = () => {
   const { isDarkColorScheme } = useColorScheme();
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
-  const [errorState, setErrorState] = React.useState(false);
 
   const {
     control,
@@ -52,6 +52,49 @@ const SignUp = () => {
     const password = formData.password.trim();
 
     setLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URL!}/api/auth/register`,
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        Alert.alert('Sukses! Berhasil Mendaftar', 'Ingin Login Sekarang?', [
+          {
+            text: 'Batal',
+            style: 'cancel',
+          },
+          {
+            text: 'Login',
+            onPress: async () => {
+              router.replace('/sign-in');
+            },
+            style: 'destructive',
+          },
+        ]);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Terjadi kesalahan saat mendaftar';
+        Alert.alert('Gagal', errorMessage);
+      } else {
+        Alert.alert('Gagal', 'Terjadi kesalahan yang tidak diketahui');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
