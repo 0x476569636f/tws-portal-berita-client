@@ -1,5 +1,7 @@
 // app/add-news.tsx
-import React, { useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -14,9 +16,15 @@ import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'
 import { Text } from '~/components/nativewindui/Text';
 import ScreenWrapper from '~/components/ScreenWrapperWithNavbar';
 import { COLORS } from '~/theme/colors';
+import { Picker, PickerItem } from '~/components/nativewindui/Picker';
 
 interface HandleHeadProps {
   tintColor: string;
+}
+
+interface Category {
+  id: number;
+  namaKategori: string;
 }
 
 export default function AddNews() {
@@ -25,12 +33,35 @@ export default function AddNews() {
   const [content, setContent] = useState<string>('');
   const colorScheme = useColorScheme();
   const colors = COLORS[colorScheme === 'dark' ? 'dark' : 'light'];
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number>(1);
 
   const handleHead = ({ tintColor }: HandleHeadProps): JSX.Element => (
     <Text style={{ color: tintColor }}>H1</Text>
   );
 
-  const submitNews = (): void => {
+  useEffect(() => {
+    fetchCategories();
+  });
+
+  const fetchCategories = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL!}/api/category`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.categories);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Terjadi kesalahan saat mengambil data kategori');
+    }
+  };
+
+  const submitNews = async (): Promise<void> => {
     if (!title.trim()) {
       Alert.alert('Error', 'Judul berita tidak boleh kosong');
       return;
@@ -40,11 +71,39 @@ export default function AddNews() {
       return;
     }
 
-    Alert.alert('Sukses', 'Berita berhasil ditambahkan');
-
-    setTitle('');
-    setContent('');
-    richText.current?.setContentHTML('');
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const user = JSON.parse((await AsyncStorage.getItem('user')) || '{}');
+      const response = await axios.post(
+        `${process.env.EXPO_PUBLIC_API_URL!}/api/news/create`,
+        {
+          kategoriId: selectedCategory,
+          userId: user.id,
+          judul: title,
+          isi: content,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        Alert.alert('Sukses', 'Berita berhasil ditambahkan');
+        setTitle('');
+        setContent('');
+        richText.current?.setContentHTML('');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Terjadi kesalahan saat mendaftar';
+        Alert.alert('Gagal', errorMessage);
+      } else {
+        Alert.alert('Gagal', 'Terjadi kesalahan yang tidak diketahui');
+      }
+    }
   };
 
   const editorInitialHeight = 300;
@@ -91,6 +150,36 @@ export default function AddNews() {
                   color: colors.foreground,
                 }}
               />
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
+                Kategori
+              </Text>
+              <View
+                style={{
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: colors.grey3,
+                  backgroundColor: colors.card,
+                  overflow: 'hidden',
+                }}>
+                <Picker
+                  selectedValue={selectedCategory}
+                  onValueChange={(itemValue) => setSelectedCategory(Number(itemValue))}
+                  style={{
+                    color: colors.foreground,
+                    backgroundColor: 'transparent',
+                  }}>
+                  {categories.map((category) => (
+                    <PickerItem
+                      key={category.id}
+                      label={category.namaKategori}
+                      value={category.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
             </View>
 
             {/* Content Editor */}
